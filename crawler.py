@@ -11,6 +11,7 @@ import pandas as pd
 # Scrapping
 from bs4 import BeautifulSoup
 from selenium import webdriver
+# from seleniumwire import webdriver
 from user_agent import generate_user_agent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -18,6 +19,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 # from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 # from selenium.webdriver.common.action_chains import ActionChains
 # from selenium.webdriver.support import expected_conditions as EC
 # from selenium.common.exceptions import UnexpectedAlertPresentException, NoAlertPresentException, NoSuchElementException, TimeoutException
@@ -27,7 +29,7 @@ import socket
 # import warnings
 # warnings.filterwarnings("ignore")
 
-def get_url(url, window=False, image=False, limit=1):
+def get_url(url, window=False, image=False, logging=False, limit=1):
     ''' Set up webdriver, useragent & Get url '''
     
     wd = None
@@ -52,8 +54,14 @@ def get_url(url, window=False, image=False, limit=1):
             if not image:
                 options.add_argument('--blink-settings=imagesEnabled=false')
 
+            dc = None
+            if not logging:
+                dc = DesiredCapabilities.CHROME
+                #log 종류는 OFF, SEVERE, WARNING, INFO, DEBUG, ALL 존재
+                dc['goog:loggingPrefs'] = {'browser': 'ALL'}
+            
             # web driver 
-            wd = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+            wd = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options, desired_capabilities=dc)
             wd.get(url)
             wd.implicitly_wait(5)
             break
