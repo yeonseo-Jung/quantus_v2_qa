@@ -83,7 +83,7 @@ def scroll_down(wd, sleep_time, check_count):
     
     cnt = 0
     while True:
-        height = wd.execute_script("return document.body.scrollHeight")
+        # height = wd.execute_script("return document.body.scrollHeight")
         wd.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
         time.sleep(sleep_time)
         cnt += 1
