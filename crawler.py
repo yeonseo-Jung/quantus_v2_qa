@@ -21,6 +21,8 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 # from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 # from selenium.webdriver.support import expected_conditions as EC
 # from selenium.common.exceptions import UnexpectedAlertPresentException, NoAlertPresentException, NoSuchElementException, TimeoutException
 
@@ -118,3 +120,45 @@ def json_iterator(url, iterations=5, headers=True):
         time.sleep(60)
         
     return res_data
+
+def click_elm(wd, by, value, index=None):
+    try:
+        if index is None:
+            if by == "id":
+                elm = wd.find_element(By.ID, value)
+            elif by == "class":
+                elm = wd.find_element(By.CLASS_NAME, value)
+            elif by == "xpath":
+                elm = wd.find_element(By.XPATH, value)
+            elif by == "tag":
+                elm = wd.find_element(By.TAG_NAME, value)
+            elif by == "css":
+                elm = wd.find_element(By.CSS_SELECTOR, value)
+            else:
+                raise ValueError("by value error")
+        
+        else:
+            if by == "id":
+                elm = wd.find_elements(By.ID, value)[index]
+            elif by == "class":
+                elm = wd.find_elements(By.CLASS_NAME, value)[index]
+            elif by == "xpath":
+                elm = wd.find_elements(By.XPATH, value)[index]
+            elif by == "tag":
+                elm = wd.find_elements(By.TAG_NAME, value)[index]
+            elif by == "css":
+                elm = wd.find_elements(By.CSS_SELECTOR, value)[index]
+            else:
+                raise ValueError("by value error")
+            
+        # element 까지 스크롤
+        action = ActionChains(wd)
+        action.move_to_element(elm).perform()
+        time.sleep(1.5)
+
+        # click elm
+        elm.click()
+        time.sleep(1.5)
+    
+    except (NoSuchElementException, IndexError):
+        print("Error: NoSuchElementException")

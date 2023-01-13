@@ -14,18 +14,32 @@ import webdriver_manager
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
-from crawler import get_url
+from crawler import get_url, click_elm
 
 class QuantusQA:
     def __init__(self):
         self.variables = {
+            "custom_filters": [],
+            "custom_factors": [],
             "logs": [],
             "alert_msg": [],
             "errors": [],
         }
+        self.gauges = {
+            # "init": "",
+            # "backtest": "",
+            # "decile": "",
+            # "port": "",
+            # "past": "",
+        }
 
     def select_level(self, wd, level: int = None):
+        """Select Level
 
+        Args:
+            wd (_type_): _description_
+            level (int, optional): _description_. Defaults to None.
+        """
         soup = BeautifulSoup(wd.page_source, "lxml")
         if soup.find("div", "css-2ho4nc"):
             d = {
@@ -41,13 +55,22 @@ class QuantusQA:
             # select level
             levels = wd.find_elements(By.CLASS_NAME, "css-2ho4nc")
             levels[level].click()
+            time.sleep(1.5)
 
             # apply
             wd.find_element(By.CLASS_NAME, "yes").click()
-            time.sleep(1)
+            time.sleep(1.5)
         
     def sign_in(self, wd, login: int = None, email: str = None, pw: str = None, level: int = None):
-        
+        """Sign in (Log in)
+
+        Args:
+            wd (_type_): _description_
+            login (int, optional): _description_. Defaults to None.
+            email (str, optional): _description_. Defaults to None.
+            pw (str, optional): _description_. Defaults to None.
+            level (int, optional): _description_. Defaults to None.
+        """
         # go to login page
         wd.get("https://v2.quantus.kr/login")
         time.sleep(1.5)
@@ -91,11 +114,25 @@ class QuantusQA:
             # wd.find_element(By.CLASS_NAME, "btn_g highlight").click()
             wd.find_element(By.XPATH, "/html/body/div/div/div/main/article/div/div/form/div[4]/button[1]").click()
             time.sleep(3.5)
+            
+            # gauge init
+            self.gauges["init"] = self.get_gauge(wd)
         
         except NoSuchElementException:
             pass
         
     def select_universe(self, wd, strategy_name: str = None, universe: int = None, removed_filters: list = [], removed_sectors: list = [], min_filter: int = 2, min_sector: int = 5):
+        """Select universe, filter, sector
+
+        Args:
+            wd (_type_): _description_
+            strategy_name (str, optional): _description_. Defaults to None.
+            universe (int, optional): _description_. Defaults to None.
+            removed_filters (list, optional): _description_. Defaults to [].
+            removed_sectors (list, optional): _description_. Defaults to [].
+            min_filter (int, optional): _description_. Defaults to 2.
+            min_sector (int, optional): _description_. Defaults to 5.
+        """
         # /backtest/universe
         # /port/universe
         
@@ -172,6 +209,12 @@ class QuantusQA:
         time.sleep(1)
         
     def select_factors(self, wd, factors: list = None):
+        """Select factors
+
+        Args:
+            wd (_type_): _description_
+            factors (list, optional): _description_. Defaults to None.
+        """
         # /backtest/factors
         # /port/factors
         
@@ -209,12 +252,59 @@ class QuantusQA:
                     # self.variables[k].append(factor)
                     self.variables["factors"].append(factor)
                     break
+    
+    def select_custom_factors(self, wd, custom_factors: dict = None):
+        """Select custom factors
+
+        Args:
+            wd (_type_): _description_
+            custom_factors (list, optional): _description_. Defaults to None.
+        """
+        
+        if custom_factors is not None:
+            denominators = custom_factors["denominators"]
+            numerators = custom_factors["numerators"]
+            custom_btn_class = "css-1bz1c0h"
+            custom_select_class = "css-9n7j5m"
+
+            custom_factor_index = 0
+            for i, j in zip(denominators, numerators):
+                custom_deno_elms_id = f"커스텀 팩터 {custom_factor_index+1}.denominator"
+                custom_numer_elms_id = f"커스텀 팩터 {custom_factor_index+1}.numerator"
+                
+                # add button
+                click_elm(wd, by="class", value=custom_btn_class)
+                
+                # set denominator 
+                click_elm(wd, by="class", value=custom_select_class, index=custom_factor_index * 2)
+                deno_elms = wd.find_elements(By.ID, custom_deno_elms_id)
+                deno = deno_elms[i].get_attribute("value")
+                deno_elms[i].click()
+                time.sleep(1.5)
+
+                # set numerator
+                click_elm(wd, by="class", value=custom_select_class, index=custom_factor_index * 2 + 1)
+                numer_elms = wd.find_elements(By.ID, custom_numer_elms_id)
+                numer = numer_elms[j].get_attribute("value")
+                numer_elms[j].click()
+                time.sleep(1.5)
+                
+                self.variables["custom_factors"].append(f"{deno} / {numer}")
+                custom_factor_index += 1
+
 
     def set_rebal_prd(self, wd, rebalancing_period: int):
+        """Select rebalancing period
+
+        Args:
+            wd (_type_): _description_
+            rebalancing_period (int): _description_
+        """
+        # rebalancing_period_xpath = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[6]/div[1]/div[2]/input"
+        # wd.find_element(By.XPATH, rebalancing_period_xpath).click()
         
-        # 리밸런싱 기간 선택
-        rebalancing_period_xpath = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[6]/div[1]/div[2]/input"
-        wd.find_element(By.XPATH, rebalancing_period_xpath).click()
+        rebalancing_class = "css-1pud7n6"
+        click_elm(wd, by="class", value=rebalancing_class)
 
         d = {
             1: "월별",
@@ -227,9 +317,12 @@ class QuantusQA:
         # j = random.randint(min(keys), max(keys))
 
         self.variables["rebalancing_period"] = d[rebalancing_period]
-        rebalancing_period_xpath = f"/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[6]/div[3]/div[{rebalancing_period}]/div/input"
         
-        wd.find_element(By.XPATH, rebalancing_period_xpath).click()
+        # rebalancing_period_xpath = f"/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[6]/div[3]/div[{rebalancing_period}]/div/input"
+        # wd.find_element(By.XPATH, rebalancing_period_xpath).click()
+        
+        rebalancing_elm_class = "css-1h6hvk5"
+        click_elm(wd, by="class", value=rebalancing_elm_class, index=rebalancing_period)
         time.sleep(1)
 
 
@@ -375,7 +468,7 @@ class QuantusQA:
             i += 1
 
 
-    def read_result(self, kind, start_time):
+    def read_result(self, wd, kind, start_time):
         for p in sys.path:
             if "Users" in p:
                 user_name = p.split("/")[2]    
@@ -430,6 +523,14 @@ class QuantusQA:
                 
                 shutil.move(path, bak)
                 _wd.quit()
+                
+                # get gauge & init gauge
+                gauge = self.get_gauge(wd)
+                used = self.gauges["init"] - gauge
+                self.gauges["init"] = gauge
+                self.gauges["backtest"] = used
+                
+                
         elif kind == 1:
             # port extraction
             file = strategy_name + "_portfolio_result.csv"
@@ -453,6 +554,14 @@ class QuantusQA:
                 self.variables["portfolio"] = str(df["Name"].tolist())
                 self.variables["industry"] = str(df["업종명"].tolist())
                 shutil.move(path, bak)
+                
+                # get gauge & init gauge
+                gauge = self.get_gauge(wd)
+                used = self.gauges["init"] - gauge
+                self.gauges["init"] = gauge
+                self.gauges["port"] = used
+                
+                
         elif kind == 2:
             # 10분위 테스트
             file = strategy_name + "_quantile_result.csv"
@@ -483,6 +592,12 @@ class QuantusQA:
                 data = df.iloc[10, :].tolist()
                 self.variables[data[0].strip() + "s"] = data[1:]
                 shutil.move(path, bak)
+                
+                # get gauge & init gauge
+                gauge = self.get_gauge(wd)
+                used = self.gauges["init"] - gauge
+                self.gauges["init"] = gauge
+                self.gauges["decile"] = used
         else:
             raise TypeError("올바른 kind(0: backtest, 1: port, 2: decile)를 입력하세요")
 
@@ -511,7 +626,11 @@ class QuantusQA:
             wd.get("https://v2.quantus.kr/port/universe")
         else:
             raise TypeError("올바른 kind(0: backtest, 1: port)를 입력하세요")
+
+        # init gauge
+        self.gauges["init"] = self.get_gauge(wd)
         
+        # reset settings
         time.sleep(1.5)
         self.reset(wd)
         
@@ -523,8 +642,12 @@ class QuantusQA:
         # 팩터 선택
         self.select_factors(wd, kwargs["factors"])
         time.sleep(2)
+        
+        # 커스텀 팩터 선택
+        self.select_custom_factors(wd, kwargs["custom_factors"])
         self.click_next_btn(wd)
-
+        
+        # 설정
         self.set_conditions(wd, **kwargs["conditions"])
             
         # 전략 저장
@@ -544,13 +667,15 @@ class QuantusQA:
             self.variables['logs'].append(_log)
         
         # get result data
-        self.read_result(kind=kind, start_time=st)
+        self.read_result(wd, kind=kind, start_time=st)
 
     def remove_strategy(self, wd):
         # 가장 최근에 저장한 전략 삭제
         wd.get("https://v2.quantus.kr/mypage/strategy")
         time.sleep(1.5)
-        wd.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div/div/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/div[3]/img").click()
+        
+        remove_xpath = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div[1]/div[2]/div[3]/img"
+        wd.find_element(By.XPATH, remove_xpath).click()
         self.check_alert(wd)
         self.check_alert(wd)
 
@@ -565,3 +690,12 @@ class QuantusQA:
             i += 1
             
         print(f"삭제한 전략 수: {i}")
+        
+        
+    def get_gauge(self, wd):
+        
+        gauge_class = "gaugediv"
+        elm = wd.find_element(By.CLASS_NAME, gauge_class)
+        remain_gauge = int(elm.get_attribute("innerHTML").replace("%", "").strip())
+        
+        return remain_gauge

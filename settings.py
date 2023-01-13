@@ -3,7 +3,7 @@
 1: "중급"
 2: "고급"
 '''
-level = 2
+level = 1
 
 '''login
 0: "구글"
@@ -149,6 +149,27 @@ removed_sectors = [15, 29]
   66: '영업이익 / 차입금 성장 (QoQ)'}}
 factors = [0, 1, 3, 4, 8, 24, 51, 52, 53, 54, 57, 58]
 
+
+# 커스텀 팩터
+{0: '시가총액',
+ 1: '재고자산',
+ 2: '무형자산',
+ 3: '자산총계',
+ 4: '자본총계',
+ 5: '매출액',
+ 6: ' 매출총이익',
+ 7: '영업이익',
+ 8: '순이익',
+ 9: '부채총계',
+ 10: '광고선전비',
+ 11: '연구개발비',
+ 12: '인건비및복리후생비'}
+custom_factors = {
+  "denominators": [],
+  "numerators": [],
+}
+
+
 # 백테스트 설정, 트레이딩 설정 (/backtest/backtest, /port/port)
 conditions = {
     "init_amounts": 4000,
@@ -179,5 +200,6 @@ filter_conditions = {
     "removed_filters": removed_filters,
     "removed_sectors": removed_sectors,
     "factors": factors,
+    "custom_factors": custom_factors,
     "conditions": conditions,
 }

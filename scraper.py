@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from crawler import get_url
+from crawler import get_url, click_elm
 
 
 def scraping_factors():
@@ -56,3 +56,27 @@ def scraping_sectors():
             d["제외할 섹터"][i] = sectors[i - len(filters)].text.strip()
             
     return d
+
+def scraping_custom_factors():
+    wd = get_url("https://v2.quantus.kr/backtest/factors", window=True, image=True)
+
+    # 다음에 할게요 
+    wd.find_element(By.CLASS_NAME, "close_button").click()
+    
+    custom_btn_class = "css-1bz1c0h"
+    click_elm(wd, by="class", value=custom_btn_class)
+    
+    custom_select_class = "css-9n7j5m"
+    click_elm(wd, by="class", value=custom_select_class)
+
+
+    custom_deno_elms_id = "커스텀 팩터 1.denominator"
+    deno_elms = wd.find_elements(By.ID, custom_deno_elms_id)
+    custom_factors = {}
+    i = 0
+    for elm in deno_elms:
+        custom_factors[i] = elm.get_attribute('value')
+        i += 1
+    
+    wd.quit()
+    return custom_factors
