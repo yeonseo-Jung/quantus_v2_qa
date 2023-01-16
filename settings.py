@@ -170,8 +170,8 @@ conditions = {
     "init_amounts": 4000,
     "fees": 1.5, # %(퍼센트)
     "stock_counts": 12,
-    "stop_loss": 16, # %(퍼센트)
-    "profit": 26, # %(퍼센트)
+    "stop_loss": 0, # %(퍼센트)
+    "profit": 0, # %(퍼센트)
     
     # rebalancing_period 
     # 0: "월별",
