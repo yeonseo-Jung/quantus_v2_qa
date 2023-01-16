@@ -73,7 +73,7 @@ class QuantusQA:
         """
         # go to login page
         wd.get("https://v2.quantus.kr/login")
-        time.sleep(1.5)
+        time.sleep(3.5)
         
         # select level
         self.select_level(wd, level)
