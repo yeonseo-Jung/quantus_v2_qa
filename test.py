@@ -493,7 +493,7 @@ class QuantusQA:
             
             # 결과 파일 생성 여부 확인
             ck = True
-            st = time.time()            
+            st = time.time()
             while not os.path.exists(path):
                 time.sleep(10)
                 # 백테스트에 100초 이상 소요되면 에러로 간주
@@ -655,6 +655,7 @@ class QuantusQA:
         self.check_alert(wd)
         time.sleep(1.5)
         
+        # 테스트 실행 및 결과 얻기
         self.get_result(wd, kind)
         
     def get_result(self, wd, kind):
@@ -695,7 +696,11 @@ class QuantusQA:
     def get_gauge(self, wd):
         
         gauge_class = "gaugediv"
-        elm = wd.find_element(By.CLASS_NAME, gauge_class)
-        remain_gauge = int(elm.get_attribute("innerHTML").replace("%", "").strip())
+        try:
+            elm = wd.find_element(By.CLASS_NAME, gauge_class)
+            remain_gauge = int(elm.get_attribute("innerHTML").replace("%", "").strip())
+        except NoSuchElementException:
+            remain_gauge = 1e10
+            
         
         return remain_gauge
