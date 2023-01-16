@@ -174,11 +174,11 @@ conditions = {
     "profit": 26, # %(퍼센트)
     
     # rebalancing_period 
-    # 1: "월별",
-    # 2: "분기별",
-    # 3: "반기별",
-    # 4: "매년",
-    "rebalancing_period": 2,
+    # 0: "월별",
+    # 1: "분기별",
+    # 2: "반기별",
+    # 3: "매년",
+    "rebalancing_period": 1,
     
     "rebalancing_method": None,
     "rebalancing_strategy": None,

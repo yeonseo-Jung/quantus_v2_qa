@@ -307,23 +307,23 @@ class QuantusQA:
         click_elm(wd, by="class", value=rebalancing_class)
 
         d = {
-            1: "월별",
-            2: "분기별",
-            3: "반기별",
-            4: "매년",
+            -1: "월별",
+            0: "분기별",
+            1: "반기별",
+            2: "매년",
         }
 
         # keys = list(d.keys())
         # j = random.randint(min(keys), max(keys))
-
+        rebalancing_period -= 1
         self.variables["rebalancing_period"] = d[rebalancing_period]
         
         # rebalancing_period_xpath = f"/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[6]/div[3]/div[{rebalancing_period}]/div/input"
         # wd.find_element(By.XPATH, rebalancing_period_xpath).click()
-        
-        rebalancing_elm_class = "css-1h6hvk5"
-        click_elm(wd, by="class", value=rebalancing_elm_class, index=rebalancing_period)
-        time.sleep(1)
+        if rebalancing_period != -1:
+            rebalancing_elm_class = "css-1h6hvk5"
+            click_elm(wd, by="class", value=rebalancing_elm_class, index=rebalancing_period)
+            time.sleep(1)
 
 
     def set_conditions(self, wd, **kwargs):
