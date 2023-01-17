@@ -173,7 +173,7 @@ conditions = {
     "stop_loss": 0, # %(퍼센트)
     "profit": 0, # %(퍼센트)
     
-    # rebalancing_period 
+    # rebalancing_period
     # 0: "월별",
     # 1: "분기별",
     # 2: "반기별",
