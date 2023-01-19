@@ -1,6 +1,4 @@
 # necessary
-import sys
-from os import path
 import time
 import pandas as pd
 

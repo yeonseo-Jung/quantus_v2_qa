@@ -8,16 +8,28 @@ from datetime import datetime
 
 import pandas as pd
 from bs4 import BeautifulSoup
-
-import selenium
-import webdriver_manager
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
-from crawler import get_url, click_elm
+# abs path
+cur_dir = os.path.dirname(os.path.realpath(__file__))
+src = os.path.abspath(os.path.join(cur_dir, os.pardir))
+sys.path.append(src)
+
+from crawling.crawler import get_url, click_elm
 
 class QuantusQA:
-    def __init__(self):
+    def __init__(self, env):
+        if env == "prod" or env == "production":
+            self.url = "https://www.quantus.kr"
+        elif env == "dev" or env == "develop":
+            self.url = "https://dev.quantus.kr"
+        else:
+            raise AttributeError("올바른 환경을 입력하세요. (production or develop)")
+        
+        self.init_variables()
+            
+    def init_variables(self):
         self.variables = {
             "custom_filters": [],
             "custom_factors": [],
@@ -72,7 +84,7 @@ class QuantusQA:
             level (int, optional): _description_. Defaults to None.
         """
         # go to login page
-        wd.get("https://v2.quantus.kr/login")
+        wd.get(f"{self.url}/login")
         time.sleep(3.5)
         
         # select level
@@ -603,7 +615,7 @@ class QuantusQA:
 
     def init_page(self, **kwargs):
         time.sleep(1.5)
-        url = "https://v2.quantus.kr/"
+        url = self.url
         wd = get_url(url, window=True, image=True, logging=True)
         time.sleep(3.5)
 
@@ -619,12 +631,12 @@ class QuantusQA:
         
         if kind == 0:
             # backtest
-            wd.get("https://v2.quantus.kr/backtest/universe")
+            wd.get(f"{self.url}/backtest/universe")
         elif kind == 1:
             # port 
-            wd.get("https://v2.quantus.kr/port/universe")
+            wd.get(f"{self.url}/port/universe")
         else:
-            raise TypeError("올바른 kind(0: backtest, 1: port)를 입력하세요")
+            raise ValueError("올바른 kind(0: backtest, 1: port)를 입력하세요")
 
         # init gauge
         self.gauges["init"] = self.get_gauge(wd)
@@ -671,7 +683,7 @@ class QuantusQA:
 
     def remove_strategy(self, wd):
         # 가장 최근에 저장한 전략 삭제
-        wd.get("https://v2.quantus.kr/mypage/strategy")
+        wd.get(f"{self.url}/mypage/strategy")
         time.sleep(1.5)
         
         remove_xpath = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]/div/div[2]/div[1]/div[2]/div[3]/img"
