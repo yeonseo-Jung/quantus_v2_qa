@@ -19,8 +19,11 @@ db = AccessDataBase("quantus_test")
 class QATests:
     def __init__(self, env, filter_conditions):
         self.qqa = QuantusQA(env)
-        self.filter_conditions = filter_conditions
+        self.init_filter(filter_conditions)
         self.wd = self.qqa.init_page(**self.filter_conditions)
+        
+    def init_filter(self, filter_conditions):
+        self.filter_conditions = filter_conditions
     
     def __quit__(self):
         self.wd.quit()
