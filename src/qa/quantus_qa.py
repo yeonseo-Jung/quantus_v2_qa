@@ -25,7 +25,7 @@ class QuantusQA:
         elif env == "dev" or env == "develop":
             self.url = "https://dev.quantus.kr"
         else:
-            raise AttributeError("올바른 환경을 입력하세요. (production or develop)")
+            raise AttributeError("올바른 환경을 입력하세요. ('production' or 'develop')")
         
         self.init_variables()
             
@@ -109,8 +109,8 @@ class QuantusQA:
                 email = 'wjddustjsla@naver.com'
                 pw = 'jys1013011!'
 
-            elm_email = wd.find_element(By.ID, "input-loginKey")
-            elm_pw = wd.find_element(By.ID, "input-password")
+            elm_email = wd.find_element(By.NAME, "loginKey")
+            elm_pw = wd.find_element(By.NAME, "password")
 
             # input login info
             elm_email.send_keys(email)
@@ -705,7 +705,7 @@ class QuantusQA:
         
         
     def get_gauge(self, wd):
-        
+        # 게이지 정보 얻기
         gauge_class = "gaugediv"
         try:
             elm = wd.find_element(By.CLASS_NAME, gauge_class)
