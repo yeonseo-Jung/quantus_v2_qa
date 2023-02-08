@@ -1,8 +1,14 @@
+import os
+import sys
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from crawler import get_url, click_elm
 
-class quantus_scraper:
+# abs path
+cur_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(cur_dir)
+import crawler as crw
+
+class QuantusScraper:
     def __init__(self, env):
         if env == "prod" or env == "production":
             self.url = "https://www.quantus.kr"
@@ -13,7 +19,7 @@ class quantus_scraper:
 
     def scraping_factors(self):
         # factor scraping
-        wd = get_url(f"{self.url}/backtest/factors")
+        wd = crw.get_url(f"{self.url}/backtest/factors")
         soup = BeautifulSoup(wd.page_source, "lxml")
 
         factor_area_class = "css-kwx3if"
@@ -41,11 +47,9 @@ class quantus_scraper:
 
         return variables, i
 
-
-
     def scraping_sectors(self):
         # 기본 필터, 제외할 섹터 스크레이핑
-        wd = get_url(f"{self.url}/backtest/universe")
+        wd = crw.get_url(f"{self.url}/backtest/universe")
         soup = BeautifulSoup(wd.page_source, "lxml")
         filter_sector_class = "css-192m3r6"
 
@@ -66,16 +70,16 @@ class quantus_scraper:
         return d
 
     def scraping_custom_factors(self):
-        wd = get_url(f"{self.url}/backtest/factors", window=True, image=True)
+        wd = crw.get_url(f"{self.url}/backtest/factors", window=True, image=True)
 
         # 다음에 할게요 
         wd.find_element(By.CLASS_NAME, "close_button").click()
         
         custom_btn_class = "css-1bz1c0h"
-        click_elm(wd, by="class", value=custom_btn_class)
+        crw.click_elm(wd, by="class", value=custom_btn_class)
         
         custom_select_class = "css-9n7j5m"
-        click_elm(wd, by="class", value=custom_select_class)
+        crw.click_elm(wd, by="class", value=custom_select_class)
 
 
         custom_deno_elms_id = "커스텀 팩터 1.denominator"
