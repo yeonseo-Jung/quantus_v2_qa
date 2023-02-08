@@ -18,6 +18,7 @@ db = AccessDataBase("quantus_test")
 
 class QATests:
     def __init__(self, env, filter_conditions):
+        self.env = env
         self.qqa = QuantusQA(env)
         self.init_filter(filter_conditions)
         self.wd = self.qqa.init_page(**self.filter_conditions)
@@ -62,4 +63,10 @@ class QATests:
     def upload(self):
         variables_list = [self.qqa.variables]
         result_df = pd.DataFrame(variables_list).astype("str")
-        db.engine_upload(upload_df=result_df, table_name="qa_test_results")
+        
+        if self.env == "dev" or self.env == "develop":
+            db.engine_upload(upload_df=result_df, table_name="qa_test_results_dev")
+        elif self.env == "prod" or self.env == "production":
+            db.engine_upload(upload_df=result_df, table_name="qa_test_results_prod")
+        else:
+            raise AttributeError("올바른 환경을 입력하세요. ('prod' or 'dev')")

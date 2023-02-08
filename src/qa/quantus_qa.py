@@ -25,7 +25,7 @@ class QuantusQA:
         elif env == "dev" or env == "develop":
             self.url = "https://dev.quantus.kr"
         else:
-            raise AttributeError("올바른 환경을 입력하세요. ('production' or 'develop')")
+            raise AttributeError("올바른 환경을 입력하세요. ('prod' or 'dev')")
         
         self.init_variables()
             
