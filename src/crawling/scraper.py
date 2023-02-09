@@ -73,7 +73,7 @@ class QuantusScraper:
         wd = crw.get_url(f"{self.url}/backtest/factors", window=True, image=True)
 
         # 다음에 할게요 
-        wd.find_element(By.CLASS_NAME, "close_button").click()
+        wd.find_element(By.CLASS_NAME, "css-evvk4f").click()
         
         custom_btn_class = "css-1bz1c0h"
         crw.click_elm(wd, by="class", value=custom_btn_class)

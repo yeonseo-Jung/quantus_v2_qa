@@ -70,7 +70,7 @@ class QuantusQA:
             time.sleep(1.5)
 
             # apply
-            wd.find_element(By.CLASS_NAME, "yes").click()
+            wd.find_element(By.CLASS_NAME, "second_button").click()
             time.sleep(1.5)
         
     def sign_in(self, wd, login: int = None, email: str = None, pw: str = None, level: int = None):
